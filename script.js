@@ -81,7 +81,7 @@ function showTable(){
         const row = document.createElement("tr");
         var keys=Object.keys(student);
 
-        var id = document.createElement('td');
+        const id = document.createElement('td');
         const name = document.createElement('td');
         const email = document.createElement('td');
         const age = document.createElement('td');
@@ -101,11 +101,16 @@ function showTable(){
             else if(key=='age'){
                 age.innerHTML = student[key];
             }
-            else if(key=='grade'){  
-                grade.innerHTML = student[key];
+            else if(key=='grade'){
+                const gpa = parseFloat(student[key]);
+                let gpaClass = 'gpa-high';
+                if (gpa < 2.5) gpaClass = 'gpa-low';
+                else if (gpa < 3.5) gpaClass = 'gpa-mid';
+                grade.innerHTML = `<span class="gpa-badge ${gpaClass}">${student[key]}</span>`;
             }
-            else
-            degree.innerHTML = `<div class='degree'><div>${student[key]}</div> <div class="icons"><a onClick="edit(${student['ID']})" class='fa'>&#xf044;</a> <a onClick="del(${student['ID']})" class='fa'>&#xf1f8;</a> </div></div> `;
+            else {
+                degree.innerHTML = `<div class='degree'><span class="degree-tag">${student[key]}</span> <div class="icons"><a onClick="edit(${student['ID']})" class='fa icon-btn edit'>&#xf044;</a> <a onClick="del(${student['ID']})" class='fa icon-btn delete'>&#xf1f8;</a></div></div>`;
+            }
 
             row.appendChild(id);
             row.appendChild(name);
