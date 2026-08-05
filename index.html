@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Student Management CRUD</title>
+    <title>Student Task Manager</title>
     <link rel="stylesheet" href="./style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -14,37 +14,96 @@
 <body>
 
     <div class="container">
-        <h1>Student Management</h1>
+        <h1>Student Task Manager</h1>
+        <p class="subtitle">Track your homework, assignments, and deadlines</p>
 
-        <div class="form-card">
-            <div class="input-container">
-                <input type="text" placeholder="Name" id="name">
-                <input type="email" placeholder="Email" id="email">
-                <input type="text" placeholder="GPA" id="grade">
-                <input type="number" placeholder="Age" id="age">
-                <input type="text" placeholder="Degree" id="degree">
+        <!-- Stats -->
+        <div class="stats">
+            <div class="stat-card">
+                <div class="label">Total</div>
+                <div class="value purple" id="stat-total">0</div>
             </div>
-            <button class="button" type="submit" id="submit" onclick="addStudent()">Add Student</button>
+            <div class="stat-card">
+                <div class="label">Pending</div>
+                <div class="value blue" id="stat-pending">0</div>
+            </div>
+            <div class="stat-card">
+                <div class="label">Due Soon</div>
+                <div class="value yellow" id="stat-soon">0</div>
+            </div>
+            <div class="stat-card">
+                <div class="label">Overdue</div>
+                <div class="value red" id="stat-overdue">0</div>
+            </div>
         </div>
 
-        <input class="search" type="text" id="search" onkeyup="search()" placeholder="Search by name, email or degree...">
+        <!-- Add/Edit Form -->
+        <div class="form-card">
+            <div class="form-row">
+                <div class="input-group">
+                    <label>Assignment Title</label>
+                    <input type="text" placeholder="e.g. Chapter 5 Problem Set" id="title">
+                </div>
+                <div class="input-group">
+                    <label>Subject</label>
+                    <select id="subject">
+                        <option value="">Select subject</option>
+                        <option value="Mathematics">Mathematics</option>
+                        <option value="Physics">Physics</option>
+                        <option value="Chemistry">Chemistry</option>
+                        <option value="Biology">Biology</option>
+                        <option value="English">English</option>
+                        <option value="History">History</option>
+                        <option value="Computer Science">Computer Science</option>
+                        <option value="Other">Other</option>
+                    </select>
+                </div>
+            </div>
+            <div class="input-group" style="margin-bottom: 16px;">
+                <label>Description (optional)</label>
+                <textarea placeholder="Add any notes or details..." id="description"></textarea>
+            </div>
+            <div class="form-row-3">
+                <div class="input-group">
+                    <label>Due Date</label>
+                    <input type="date" id="dueDate">
+                </div>
+                <div class="input-group">
+                    <label>Priority</label>
+                    <select id="priority">
+                        <option value="low">Low</option>
+                        <option value="medium" selected>Medium</option>
+                        <option value="high">High</option>
+                    </select>
+                </div>
+                <div class="input-group">
+                    <label>Status</label>
+                    <select id="status">
+                        <option value="pending">Pending</option>
+                        <option value="in-progress">In Progress</option>
+                        <option value="completed">Completed</option>
+                    </select>
+                </div>
+            </div>
+            <button class="btn btn-primary" type="button" id="submit" onclick="addTask()">Add Assignment</button>
+        </div>
 
-        <div class="table-wrapper">
-            <table class="table" id="table">
-                <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>Student Name</th>
-                        <th>Email</th>
-                        <th>Age</th>
-                        <th>GPA</th>
-                        <th>Degree</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody id="tbody">
-                </tbody>
-            </table>
+        <!-- Filters -->
+        <div class="filters">
+            <input type="text" class="search-box" placeholder="Search assignments..." id="search" onkeyup="filterTasks()">
+            <button class="filter-btn active" onclick="setFilter('all', this)">All</button>
+            <button class="filter-btn" onclick="setFilter('pending', this)">Pending</button>
+            <button class="filter-btn" onclick="setFilter('in-progress', this)">In Progress</button>
+            <button class="filter-btn" onclick="setFilter('completed', this)">Completed</button>
+            <button class="filter-btn" onclick="setFilter('overdue', this)">Overdue</button>
+        </div>
+
+        <!-- Task List -->
+        <div class="task-list" id="taskList">
+            <div class="empty-state">
+                <div class="icon">&#xf0ae;</div>
+                <p>No assignments yet. Add your first one above!</p>
+            </div>
         </div>
     </div>
 

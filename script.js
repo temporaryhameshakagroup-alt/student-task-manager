@@ -1,181 +1,194 @@
-var count = 0;
-var students = []; 
-var global_id;
-function addStudent(){
- 
-    const nameValue = document.getElementById('name').value;
-    const emailValue = document.getElementById('email').value;
-    const ageValue = document.getElementById('age').value;
-    const gradeValue = document.getElementById('grade').value;
-    const degreeValue = document.getElementById('degree').value;
+var tasks = [];
+var editId = null;
+var currentFilter = 'all';
 
-    if(document.querySelector("#submit").innerText == "Edit Student"){
-        console.log("this will edit and not add");
-        console.log(global_id);
-        let index;
+function addTask() {
+    const title = document.getElementById('title').value.trim();
+    const subject = document.getElementById('subject').value;
+    const description = document.getElementById('description').value.trim();
+    const dueDate = document.getElementById('dueDate').value;
+    const priority = document.getElementById('priority').value;
+    const status = document.getElementById('status').value;
 
-        for (let i = 0; i < students.length; i++) {
-            if (students[i]['ID'] == global_id) {
-                index=i;
-                break;
-            }
-        }
-
-        let studentobj = students[index];
-
-        studentobj['name'] = nameValue;
-        studentobj['email'] = emailValue;
-        studentobj['grade'] = gradeValue;
-        studentobj['age'] = ageValue;
-        studentobj['degree'] = degreeValue;
-
-        students[index] = studentobj;
-
-        showTable();
-        document.querySelector("#submit").innerHTML = "Add Student";
-
-            document.getElementById('name').value="";
-            document.getElementById('email').value="";
-            document.getElementById('age').value="";
-            document.getElementById('grade').value="";
-            document.getElementById('degree').value="";
-        
-     return;
-
-    }
-    if(nameValue=='' || emailValue=='' || ageValue=='' || gradeValue =='' || degreeValue==""){
-        alert("All fields are required!")
+    if (!title || !subject || !dueDate) {
+        alert('Please fill in title, subject, and due date!');
         return;
     }
-    count++;
 
-    students.push({
-        ID:count,
-        name:nameValue,
-        email:emailValue,
-        age:ageValue,
-        grade:gradeValue,
-        degree:degreeValue
+    if (editId !== null) {
+        const index = tasks.findIndex(t => t.id === editId);
+        if (index !== -1) {
+            tasks[index] = { id: editId, title, subject, description, dueDate, priority, status };
+        }
+        editId = null;
+        document.getElementById('submit').innerText = 'Add Assignment';
+    } else {
+        const id = Date.now();
+        tasks.push({ id, title, subject, description, dueDate, priority, status });
+    }
+
+    clearForm();
+    filterTasks();
+}
+
+function clearForm() {
+    document.getElementById('title').value = '';
+    document.getElementById('subject').value = '';
+    document.getElementById('description').value = '';
+    document.getElementById('dueDate').value = '';
+    document.getElementById('priority').value = 'medium';
+    document.getElementById('status').value = 'pending';
+}
+
+function toggleComplete(id) {
+    const index = tasks.findIndex(t => t.id === id);
+    if (index !== -1) {
+        if (tasks[index].status === 'completed') {
+            tasks[index].status = 'pending';
+        } else {
+            tasks[index].status = 'completed';
+        }
+        filterTasks();
+    }
+}
+
+function editTask(id) {
+    const task = tasks.find(t => t.id === id);
+    if (!task) return;
+
+    document.getElementById('title').value = task.title;
+    document.getElementById('subject').value = task.subject;
+    document.getElementById('description').value = task.description;
+    document.getElementById('dueDate').value = task.dueDate;
+    document.getElementById('priority').value = task.priority;
+    document.getElementById('status').value = task.status;
+
+    editId = id;
+    document.getElementById('submit').innerText = 'Update Assignment';
+
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function deleteTask(id) {
+    tasks = tasks.filter(t => t.id !== id);
+    filterTasks();
+}
+
+function setFilter(filter, btn) {
+    currentFilter = filter;
+    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    filterTasks();
+}
+
+function isOverdue(dueDate, status) {
+    if (status === 'completed') return false;
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const due = new Date(dueDate);
+    return due < today;
+}
+
+function isDueSoon(dueDate, status) {
+    if (status === 'completed') return false;
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const due = new Date(dueDate);
+    const diff = (due - today) / (1000 * 60 * 60 * 24);
+    return diff >= 0 && diff <= 2;
+}
+
+function formatDate(dueDate) {
+    const date = new Date(dueDate);
+    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    return `${months[date.getMonth()]} ${date.getDate()}`;
+}
+
+function updateStats() {
+    const total = tasks.length;
+    const pending = tasks.filter(t => t.status !== 'completed').length;
+    const soon = tasks.filter(t => isDueSoon(t.dueDate, t.status)).length;
+    const overdue = tasks.filter(t => isOverdue(t.dueDate, t.status)).length;
+
+    document.getElementById('stat-total').innerText = total;
+    document.getElementById('stat-pending').innerText = pending;
+    document.getElementById('stat-soon').innerText = soon;
+    document.getElementById('stat-overdue').innerText = overdue;
+}
+
+function filterTasks() {
+    const query = document.getElementById('search').value.toLowerCase();
+    let filtered = tasks.filter(t => {
+        const matchesSearch = t.title.toLowerCase().includes(query) ||
+                             t.subject.toLowerCase().includes(query);
+        if (!matchesSearch) return false;
+
+        switch (currentFilter) {
+            case 'pending': return t.status === 'pending';
+            case 'in-progress': return t.status === 'in-progress';
+            case 'completed': return t.status === 'completed';
+            case 'overdue': return isOverdue(t.dueDate, t.status);
+            default: return true;
+        }
     });
 
+    // Sort by due date (overdue first, then ascending)
+    filtered.sort((a, b) => {
+        if (a.status === 'completed' && b.status !== 'completed') return 1;
+        if (a.status !== 'completed' && b.status === 'completed') return -1;
+        return new Date(a.dueDate) - new Date(b.dueDate);
+    });
 
-    document.getElementById('name').value="";
-    document.getElementById('email').value="";
-    document.getElementById('age').value="";
-    document.getElementById('grade').value="";
-    document.getElementById('degree').value="";
-    console.log(students);
-    showTable();
+    renderTasks(filtered);
+    updateStats();
 }
 
+function renderTasks(taskList) {
+    const container = document.getElementById('taskList');
 
-function showTable(){
-    const table = document.getElementById('tbody');
-    while (table.hasChildNodes()) {
-        table.removeChild(table.firstChild);
+    if (taskList.length === 0) {
+        container.innerHTML = '<div class="empty-state"><div class="icon">&#xf0ae;</div><p>No assignments found.</p></div>';
+        return;
     }
 
-    table.value="";
-    students.forEach((student)=>{
+    container.innerHTML = taskList.map(task => {
+        const overdue = isOverdue(task.dueDate, task.status);
+        const dueSoon = isDueSoon(task.dueDate, task.status);
+        const completed = task.status === 'completed';
 
-        const row = document.createElement("tr");
-        var keys=Object.keys(student);
+        let cardClass = 'task-card';
+        if (completed) cardClass += ' completed';
+        if (overdue) cardClass += ' overdue';
 
-        const id = document.createElement('td');
-        const name = document.createElement('td');
-        const email = document.createElement('td');
-        const age = document.createElement('td');
-        const grade = document.createElement('td');
-        const degree = document.createElement('td');
+        let dateClass = 'due-date';
+        if (dueSoon) dateClass += ' soon';
 
-        keys.forEach((key)=>{
-            if(key=='ID'){
-                id.innerHTML = student[key];
-            }
-            else if(key=='name'){
-                name.innerHTML = student[key];
-            }
-            else if(key=='email'){
-                email.innerHTML = student[key];
-            }
-            else if(key=='age'){
-                age.innerHTML = student[key];
-            }
-            else if(key=='grade'){
-                const gpa = parseFloat(student[key]);
-                let gpaClass = 'gpa-high';
-                if (gpa < 2.5) gpaClass = 'gpa-low';
-                else if (gpa < 3.5) gpaClass = 'gpa-mid';
-                grade.innerHTML = `<span class="gpa-badge ${gpaClass}">${student[key]}</span>`;
-            }
-            else {
-                degree.innerHTML = `<div class='degree'><span class="degree-tag">${student[key]}</span> <div class="icons"><a onClick="edit(${student['ID']})" class='fa icon-btn edit'>&#xf044;</a> <a onClick="del(${student['ID']})" class='fa icon-btn delete'>&#xf1f8;</a></div></div>`;
-            }
+        const checkboxClass = completed ? 'task-checkbox checked' : 'task-checkbox';
+        const priorityLabel = task.priority.charAt(0).toUpperCase() + task.priority.slice(1);
 
-            row.appendChild(id);
-            row.appendChild(name);
-            row.appendChild(email);
-            row.appendChild(age);
-            row.appendChild(grade);
-            row.appendChild(degree);       
-        })
-
-        table.appendChild(row);
-    })
+        return `
+            <div class="${cardClass}">
+                <div class="${checkboxClass}" onclick="toggleComplete(${task.id})"></div>
+                <div class="task-content">
+                    <p class="task-title">${escapeHtml(task.title)}</p>
+                    ${task.description ? `<p class="task-desc">${escapeHtml(task.description)}</p>` : ''}
+                    <div class="task-meta">
+                        <span class="task-tag tag-subject">${task.subject}</span>
+                        <span class="task-tag tag-priority-${task.priority}">${priorityLabel}</span>
+                        <span class="${dateClass}">&#xf073; ${formatDate(task.dueDate)}</span>
+                    </div>
+                </div>
+                <div class="task-actions">
+                    <a onClick="editTask(${task.id})" class="icon-btn edit">&#xf044;</a>
+                    <a onClick="deleteTask(${task.id})" class="icon-btn delete">&#xf1f8;</a>
+                </div>
+            </div>
+        `;
+    }).join('');
 }
 
-function search(){
-  var input, filter, table, tr, td, i, txtValue,txtValue1,txtValue2;
-  input = document.getElementById("search");
-  filter = input.value.toUpperCase();
-  table = document.getElementById("tbody");
-  tr = table.getElementsByTagName("tr");
-
-
-  for (i = 0; i < tr.length; i++) {
-    td = tr[i].getElementsByTagName("td")[1];
-    td1 = tr[i].getElementsByTagName("td")[2];
-    td2 = tr[i].getElementsByTagName("td")[5];
-    if (td || td1 || td2) {
-      txtValue = td.textContent || td.innerText;
-      txtValue1 = td1.textContent || td1.innerText;
-      txtValue2 = td2.textContent || td2.innerText;
-      if (txtValue.toUpperCase().indexOf(filter) > -1 || txtValue1.toUpperCase().indexOf(filter) > -1 || txtValue2.toUpperCase().indexOf(filter) > -1) {
-        tr[i].style.display = "";
-      } else {
-        tr[i].style.display = "none";
-      }
-    }
-  }
-}
-
-
-function edit(id) {
-    let student;
-    console.log(id);
-    for (let i = 0; i < students.length; i++) {
-        if (students[i]['ID'] == id) {
-            student = students[i];
-            break;
-        }
-    }
-
-    document.querySelector("#name").value = student['name'];
-    document.querySelector("#email").value = student['email'];
-    document.querySelector("#grade").value = student['grade'];
-    document.querySelector("#age").value = student['age'];
-    document.querySelector("#degree").value = student['degree'];
-
-    document.getElementById("submit").innerText = "Edit Student";
-
-    global_id=id;
-}
-
-function del(id){
-    students.forEach((student,index) => {
-        if(student['ID']==id){
-            students.splice(index,1);
-            showTable();
-        }
-    })
+function escapeHtml(str) {
+    const div = document.createElement('div');
+    div.textContent = str;
+    return div.innerHTML;
 }
