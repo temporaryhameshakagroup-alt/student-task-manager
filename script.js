@@ -1,6 +1,29 @@
-var tasks = [];
 var editId = null;
 var currentFilter = 'all';
+
+function getFutureDate(days) {
+    const d = new Date();
+    d.setDate(d.getDate() + days);
+    return d.toISOString().split('T')[0];
+}
+
+var tasks = [
+    { id: 1, title: 'Chapter 5 Problem Set', subject: 'Mathematics', description: 'Complete exercises 1-20 on integration by parts', dueDate: getFutureDate(1), priority: 'high', status: 'pending' },
+    { id: 2, title: 'Lab Report: Pendulum Experiment', subject: 'Physics', description: 'Write up results from Thursday\'s lab session', dueDate: getFutureDate(3), priority: 'medium', status: 'in-progress' },
+    { id: 3, title: 'Essay: Industrial Revolution', subject: 'History', description: '1500 word essay on social impacts', dueDate: getFutureDate(-2), priority: 'high', status: 'pending' },
+    { id: 4, title: 'Read Act 3 of Hamlet', subject: 'English', description: 'Answer comprehension questions at the end', dueDate: getFutureDate(0), priority: 'low', status: 'pending' },
+    { id: 5, title: 'Build To-Do App', subject: 'Computer Science', description: 'Final project using vanilla JS', dueDate: getFutureDate(7), priority: 'medium', status: 'in-progress' },
+    { id: 6, title: 'Organic Chemistry Worksheet', subject: 'Chemistry', description: 'Reaction mechanisms practice', dueDate: getFutureDate(-5), priority: 'medium', status: 'completed' },
+    { id: 7, title: 'Biology Flashcards', subject: 'Biology', description: 'Create flashcards for cell division chapter', dueDate: getFutureDate(2), priority: 'low', status: 'pending' }
+];
+
+// Set default due date to 3 days from now
+document.getElementById('dueDate').value = getFutureDate(3);
+
+// Render on load
+document.addEventListener('DOMContentLoaded', function() {
+    filterTasks();
+});
 
 function addTask() {
     const title = document.getElementById('title').value.trim();
@@ -179,8 +202,8 @@ function renderTasks(taskList) {
                     </div>
                 </div>
                 <div class="task-actions">
-                    <a onClick="editTask(${task.id})" class="icon-btn edit">&#xf044;</a>
-                    <a onClick="deleteTask(${task.id})" class="icon-btn delete">&#xf1f8;</a>
+                    <a onClick="editTask(${task.id})" class="fa icon-btn edit">&#xf044;</a>
+                    <a onClick="deleteTask(${task.id})" class="fa icon-btn delete">&#xf1f8;</a>
                 </div>
             </div>
         `;
