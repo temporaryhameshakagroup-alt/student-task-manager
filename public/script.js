@@ -1,3 +1,4 @@
+var tasks = [];
 var editId = null;
 var currentFilter = 'all';
 
@@ -7,25 +8,23 @@ function getFutureDate(days) {
     return d.toISOString().split('T')[0];
 }
 
-var tasks = [
-    { id: 1, title: 'Chapter 5 Problem Set', subject: 'Mathematics', description: 'Complete exercises 1-20 on integration by parts', dueDate: getFutureDate(1), priority: 'high', status: 'pending' },
-    { id: 2, title: 'Lab Report: Pendulum Experiment', subject: 'Physics', description: 'Write up results from Thursday\'s lab session', dueDate: getFutureDate(3), priority: 'medium', status: 'in-progress' },
-    { id: 3, title: 'Essay: Industrial Revolution', subject: 'History', description: '1500 word essay on social impacts', dueDate: getFutureDate(-2), priority: 'high', status: 'pending' },
-    { id: 4, title: 'Read Act 3 of Hamlet', subject: 'English', description: 'Answer comprehension questions at the end', dueDate: getFutureDate(0), priority: 'low', status: 'pending' },
-    { id: 5, title: 'Build To-Do App', subject: 'Computer Science', description: 'Final project using vanilla JS', dueDate: getFutureDate(7), priority: 'medium', status: 'in-progress' },
-    { id: 6, title: 'Organic Chemistry Worksheet', subject: 'Chemistry', description: 'Reaction mechanisms practice', dueDate: getFutureDate(-5), priority: 'medium', status: 'completed' },
-    { id: 7, title: 'Biology Flashcards', subject: 'Biology', description: 'Create flashcards for cell division chapter', dueDate: getFutureDate(2), priority: 'low', status: 'pending' }
-];
+async function loadTasks() {
+    const res = await fetch('/api/tasks');
+    if (!res.ok) {
+        alert('Failed to load tasks.');
+        return;
+    }
+    tasks = await res.json();
+    filterTasks();
+}
 
 // Set default due date to 3 days from now
 document.getElementById('dueDate').value = getFutureDate(3);
 
 // Render on load
-document.addEventListener('DOMContentLoaded', function() {
-    filterTasks();
-});
+document.addEventListener('DOMContentLoaded', loadTasks);
 
-function addTask() {
+async function addTask() {
     const title = document.getElementById('title').value.trim();
     const subject = document.getElementById('subject').value;
     const description = document.getElementById('description').value.trim();
@@ -38,20 +37,31 @@ function addTask() {
         return;
     }
 
+    let res;
     if (editId !== null) {
-        const index = tasks.findIndex(t => t.id === editId);
-        if (index !== -1) {
-            tasks[index] = { id: editId, title, subject, description, dueDate, priority, status };
-        }
+        res = await fetch(`/api/tasks/${editId}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ title, subject, description, dueDate, priority, status })
+        });
         editId = null;
-        document.getElementById('submit').innerText = 'Add Assignment';
+        document.getElementById('submit').innerText = 'Add Task';
     } else {
-        const id = Date.now();
-        tasks.push({ id, title, subject, description, dueDate, priority, status });
+        res = await fetch('/api/tasks', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ title, subject, description, dueDate, priority, status })
+        });
+    }
+
+    if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        alert(data.error || 'Something went wrong.');
+        return;
     }
 
     clearForm();
-    filterTasks();
+    await loadTasks();
 }
 
 function clearForm() {
@@ -63,16 +73,23 @@ function clearForm() {
     document.getElementById('status').value = 'pending';
 }
 
-function toggleComplete(id) {
-    const index = tasks.findIndex(t => t.id === id);
-    if (index !== -1) {
-        if (tasks[index].status === 'completed') {
-            tasks[index].status = 'pending';
-        } else {
-            tasks[index].status = 'completed';
-        }
-        filterTasks();
+async function toggleComplete(id) {
+    const task = tasks.find(t => t.id === id);
+    if (!task) return;
+
+    task.status = task.status === 'completed' ? 'pending' : 'completed';
+
+    const res = await fetch(`/api/tasks/${id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(task)
+    });
+
+    if (!res.ok) {
+        alert('Failed to update task.');
+        return;
     }
+    await loadTasks();
 }
 
 function editTask(id) {
@@ -87,14 +104,18 @@ function editTask(id) {
     document.getElementById('status').value = task.status;
 
     editId = id;
-    document.getElementById('submit').innerText = 'Update Assignment';
+    document.getElementById('submit').innerText = 'Update Task';
 
     window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
-function deleteTask(id) {
-    tasks = tasks.filter(t => t.id !== id);
-    filterTasks();
+async function deleteTask(id) {
+    const res = await fetch(`/api/tasks/${id}`, { method: 'DELETE' });
+    if (!res.ok) {
+        alert('Failed to delete task.');
+        return;
+    }
+    await loadTasks();
 }
 
 function setFilter(filter, btn) {
@@ -140,7 +161,7 @@ function updateStats() {
 }
 
 function filterTasks() {
-    const query = document.getElementById('search').value.toLowerCase();
+    const query = (document.getElementById('search').value || '').toLowerCase();
     let filtered = tasks.filter(t => {
         const matchesSearch = t.title.toLowerCase().includes(query) ||
                              t.subject.toLowerCase().includes(query);
@@ -170,7 +191,7 @@ function renderTasks(taskList) {
     const container = document.getElementById('taskList');
 
     if (taskList.length === 0) {
-        container.innerHTML = '<div class="empty-state"><div class="icon">&#xf0ae;</div><p>No assignments found.</p></div>';
+        container.innerHTML = '<div class="empty-state"><p>No assignments found.</p></div>';
         return;
     }
 
@@ -196,14 +217,14 @@ function renderTasks(taskList) {
                     <p class="task-title">${escapeHtml(task.title)}</p>
                     ${task.description ? `<p class="task-desc">${escapeHtml(task.description)}</p>` : ''}
                     <div class="task-meta">
-                        <span class="task-tag tag-subject">${task.subject}</span>
+                        <span class="task-tag tag-subject">${escapeHtml(task.subject)}</span>
                         <span class="task-tag tag-priority-${task.priority}">${priorityLabel}</span>
-                        <span class="${dateClass}">&#xf073; ${formatDate(task.dueDate)}</span>
+                        <span class="${dateClass}">&#128197; ${formatDate(task.dueDate)}</span>
                     </div>
                 </div>
                 <div class="task-actions">
-                    <a onClick="editTask(${task.id})" class="fa icon-btn edit">&#xf044;</a>
-                    <a onClick="deleteTask(${task.id})" class="fa icon-btn delete">&#xf1f8;</a>
+                    <button class="icon-btn edit" onclick="editTask(${task.id})">Edit</button>
+                    <button class="icon-btn delete" onclick="deleteTask(${task.id})">Delete</button>
                 </div>
             </div>
         `;
