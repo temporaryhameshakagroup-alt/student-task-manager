@@ -2,14 +2,9 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Student Task Manager</title>
     <link rel="stylesheet" href="./style.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
 
@@ -42,13 +37,13 @@
             <div class="form-row">
                 <div class="input-group">
                     <label>Assignment Title</label>
-                    <input type="text" placeholder="e.g. Chapter 5 Problem Set" id="title" value="Linear Algebra Homework 3">
+                    <input type="text" placeholder="e.g. Chapter 5 Problem Set" id="title">
                 </div>
                 <div class="input-group">
                     <label>Subject</label>
                     <select id="subject">
                         <option value="">Select subject</option>
-                        <option value="Mathematics" selected>Mathematics</option>
+                        <option value="Mathematics">Mathematics</option>
                         <option value="Physics">Physics</option>
                         <option value="Chemistry">Chemistry</option>
                         <option value="Biology">Biology</option>
@@ -61,7 +56,7 @@
             </div>
             <div class="input-group" style="margin-bottom: 16px;">
                 <label>Description (optional)</label>
-                <textarea placeholder="Add any notes or details..." id="description">Complete problems 1-15 on eigenvalues and eigenvectors</textarea>
+                <textarea placeholder="Add any notes or details..." id="description"></textarea>
             </div>
             <div class="form-row-3">
                 <div class="input-group">
@@ -73,13 +68,13 @@
                     <select id="priority">
                         <option value="low">Low</option>
                         <option value="medium">Medium</option>
-                        <option value="high" selected>High</option>
+                        <option value="high">High</option>
                     </select>
                 </div>
                 <div class="input-group">
                     <label>Status</label>
                     <select id="status">
-                        <option value="pending" selected>Pending</option>
+                        <option value="pending">Pending</option>
                         <option value="in-progress">In Progress</option>
                         <option value="completed">Completed</option>
                     </select>
@@ -101,7 +96,6 @@
         <!-- Task List -->
         <div class="task-list" id="taskList">
             <div class="empty-state">
-                <div class="icon">&#xf0ae;</div>
                 <p>No assignments yet. Add your first one above!</p>
             </div>
         </div>
