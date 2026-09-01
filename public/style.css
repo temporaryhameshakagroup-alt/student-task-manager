@@ -1,9 +1,76 @@
+:root {
+    --bg: #f5f5f5;
+    --text: #222;
+    --text-muted: #666;
+    --text-light: #777;
+    --text-lighter: #888;
+    --text-label: #555;
+    --card-bg: #fff;
+    --card-border: #ddd;
+    --input-border: #ccc;
+    --input-bg: #fff;
+    --input-text: #222;
+    --hover-bg: #eee;
+    --empty-border: #ccc;
+    --tag-subject-bg: #ede9fe;
+    --tag-subject-text: #5b21b6;
+    --tag-high-bg: #fee2e2;
+    --tag-high-text: #b91c1c;
+    --tag-medium-bg: #fef3c7;
+    --tag-medium-text: #92400e;
+    --tag-low-bg: #dcfce7;
+    --tag-low-text: #15803d;
+    --edit-bg: #eff6ff;
+    --edit-text: #1d4ed8;
+    --edit-hover-bg: #dbeafe;
+    --delete-bg: #fef2f2;
+    --delete-text: #b91c1c;
+    --delete-hover-bg: #fee2e2;
+    --checkbox-border: #999;
+    --primary: #2563eb;
+    --primary-hover: #1d4ed8;
+}
+
+body.dark-mode {
+    --bg: #1a1a2e;
+    --text: #e0e0e0;
+    --text-muted: #aaa;
+    --text-light: #999;
+    --text-lighter: #888;
+    --text-label: #bbb;
+    --card-bg: #16213e;
+    --card-border: #2a2a4a;
+    --input-border: #3a3a5a;
+    --input-bg: #0f3460;
+    --input-text: #e0e0e0;
+    --hover-bg: #1a1a3e;
+    --empty-border: #3a3a5a;
+    --tag-subject-bg: #2d1b69;
+    --tag-subject-text: #c4b5fd;
+    --tag-high-bg: #4c1d1d;
+    --tag-high-text: #fca5a5;
+    --tag-medium-bg: #4a3a1a;
+    --tag-medium-text: #fcd34d;
+    --tag-low-bg: #1a3a2a;
+    --tag-low-text: #86efac;
+    --edit-bg: #1a2a4a;
+    --edit-text: #93c5fd;
+    --edit-hover-bg: #1e3a5f;
+    --delete-bg: #3a1a1a;
+    --delete-text: #fca5a5;
+    --delete-hover-bg: #4c2020;
+    --checkbox-border: #666;
+    --primary: #3b82f6;
+    --primary-hover: #2563eb;
+}
+
 body {
     font-family: system-ui, -apple-system, 'Segoe UI', Roboto, Arial, sans-serif;
-    background-color: #f5f5f5;
-    color: #222;
+    background-color: var(--bg);
+    color: var(--text);
     margin: 0;
     min-height: 100vh;
+    transition: background-color 0.2s, color 0.2s;
 }
 
 * {
@@ -16,15 +83,40 @@ body {
     padding: 32px 20px;
 }
 
-h1 {
+/* Header */
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+}
+
+.header-text h1 {
     font-size: 26px;
     margin: 0 0 6px;
 }
 
 .subtitle {
-    color: #666;
+    color: var(--text-muted);
     font-size: 14px;
     margin: 0 0 24px;
+}
+
+/* Dark mode toggle */
+.theme-toggle {
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    border-radius: 8px;
+    padding: 8px 12px;
+    cursor: pointer;
+    font-size: 18px;
+    line-height: 1;
+    transition: background-color 0.2s, border-color 0.2s;
+    flex-shrink: 0;
+    margin-top: 2px;
+}
+
+.theme-toggle:hover {
+    border-color: var(--primary);
 }
 
 /* Stats */
@@ -36,15 +128,16 @@ h1 {
 }
 
 .stat-card {
-    background: #fff;
-    border: 1px solid #ddd;
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
     border-radius: 8px;
     padding: 14px 16px;
+    transition: background-color 0.2s, border-color 0.2s;
 }
 
 .stat-card .label {
     font-size: 12px;
-    color: #777;
+    color: var(--text-light);
     text-transform: uppercase;
     letter-spacing: 0.5px;
     margin-bottom: 4px;
@@ -62,11 +155,12 @@ h1 {
 
 /* Form */
 .form-card {
-    background: #fff;
-    border: 1px solid #ddd;
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
     border-radius: 8px;
     padding: 20px;
     margin-bottom: 20px;
+    transition: background-color 0.2s, border-color 0.2s;
 }
 
 .form-row,
@@ -88,7 +182,7 @@ h1 {
 .input-group label {
     font-size: 12px;
     font-weight: 600;
-    color: #555;
+    color: var(--text-label);
     text-transform: uppercase;
     letter-spacing: 0.4px;
 }
@@ -96,16 +190,17 @@ h1 {
 .input-group input,
 .input-group select,
 .input-group textarea {
-    border: 1px solid #ccc;
+    border: 1px solid var(--input-border);
     border-radius: 6px;
     height: 38px;
     padding: 0 10px;
     width: 100%;
-    color: #222;
+    color: var(--input-text);
     font-size: 14px;
     font-family: inherit;
     outline: none;
-    background: #fff;
+    background: var(--input-bg);
+    transition: background-color 0.2s, border-color 0.2s, color 0.2s;
 }
 
 .input-group textarea {
@@ -117,7 +212,7 @@ h1 {
 .input-group input:focus,
 .input-group select:focus,
 .input-group textarea:focus {
-    border-color: #2563eb;
+    border-color: var(--primary);
 }
 
 /* Buttons */
@@ -133,13 +228,13 @@ h1 {
 }
 
 .btn-primary {
-    background: #2563eb;
+    background: var(--primary);
     color: #fff;
     width: 100%;
 }
 
 .btn-primary:hover {
-    background: #1d4ed8;
+    background: var(--primary-hover);
 }
 
 /* Filters */
@@ -154,40 +249,42 @@ h1 {
 .filter-btn {
     padding: 6px 14px;
     border-radius: 16px;
-    border: 1px solid #ccc;
-    background: #fff;
-    color: #444;
+    border: 1px solid var(--input-border);
+    background: var(--card-bg);
+    color: var(--text);
     font-size: 13px;
     font-family: inherit;
     cursor: pointer;
+    transition: background-color 0.2s, border-color 0.2s, color 0.2s;
 }
 
 .filter-btn:hover {
-    background: #eee;
+    background: var(--hover-bg);
 }
 
 .filter-btn.active {
-    background: #2563eb;
-    border-color: #2563eb;
+    background: var(--primary);
+    border-color: var(--primary);
     color: #fff;
 }
 
 .search-box {
     flex: 1;
     min-width: 200px;
-    background: #fff;
-    border: 1px solid #ccc;
+    background: var(--input-bg);
+    border: 1px solid var(--input-border);
     border-radius: 6px;
     height: 34px;
     padding: 0 10px;
-    color: #222;
+    color: var(--input-text);
     font-size: 13px;
     font-family: inherit;
     outline: none;
+    transition: background-color 0.2s, border-color 0.2s, color 0.2s;
 }
 
 .search-box:focus {
-    border-color: #2563eb;
+    border-color: var(--primary);
 }
 
 /* Task list */
@@ -198,13 +295,14 @@ h1 {
 }
 
 .task-card {
-    background: #fff;
-    border: 1px solid #ddd;
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
     border-radius: 8px;
     padding: 14px 16px;
     display: flex;
     align-items: center;
     gap: 12px;
+    transition: background-color 0.2s, border-color 0.2s;
 }
 
 .task-card.completed {
@@ -213,7 +311,7 @@ h1 {
 
 .task-card.completed .task-title {
     text-decoration: line-through;
-    color: #777;
+    color: var(--text-light);
 }
 
 .task-card.overdue {
@@ -224,20 +322,20 @@ h1 {
 .task-checkbox {
     width: 18px;
     height: 18px;
-    border: 2px solid #999;
+    border: 2px solid var(--checkbox-border);
     border-radius: 4px;
     cursor: pointer;
     flex-shrink: 0;
-    transition: background 0.15s;
+    transition: background 0.15s, border-color 0.15s;
 }
 
 .task-checkbox:hover {
-    border-color: #2563eb;
+    border-color: var(--primary);
 }
 
 .task-checkbox.checked {
-    background: #2563eb;
-    border-color: #2563eb;
+    background: var(--primary);
+    border-color: var(--primary);
 }
 
 /* Task content */
@@ -254,7 +352,7 @@ h1 {
 
 .task-desc {
     font-size: 13px;
-    color: #666;
+    color: var(--text-muted);
     margin: 0;
 }
 
@@ -274,28 +372,28 @@ h1 {
 }
 
 .tag-subject {
-    background: #ede9fe;
-    color: #5b21b6;
+    background: var(--tag-subject-bg);
+    color: var(--tag-subject-text);
 }
 
 .tag-priority-high {
-    background: #fee2e2;
-    color: #b91c1c;
+    background: var(--tag-high-bg);
+    color: var(--tag-high-text);
 }
 
 .tag-priority-medium {
-    background: #fef3c7;
-    color: #92400e;
+    background: var(--tag-medium-bg);
+    color: var(--tag-medium-text);
 }
 
 .tag-priority-low {
-    background: #dcfce7;
-    color: #15803d;
+    background: var(--tag-low-bg);
+    color: var(--tag-low-text);
 }
 
 .due-date {
     font-size: 12px;
-    color: #555;
+    color: var(--text-label);
 }
 
 .due-date.soon {
@@ -320,31 +418,32 @@ h1 {
 }
 
 .icon-btn.edit {
-    background: #eff6ff;
-    color: #1d4ed8;
+    background: var(--edit-bg);
+    color: var(--edit-text);
 }
 
 .icon-btn.edit:hover {
-    background: #dbeafe;
+    background: var(--edit-hover-bg);
 }
 
 .icon-btn.delete {
-    background: #fef2f2;
-    color: #b91c1c;
+    background: var(--delete-bg);
+    color: var(--delete-text);
 }
 
 .icon-btn.delete:hover {
-    background: #fee2e2;
+    background: var(--delete-hover-bg);
 }
 
 /* Empty state */
 .empty-state {
     text-align: center;
     padding: 48px 16px;
-    color: #888;
-    background: #fff;
-    border: 1px dashed #ccc;
+    color: var(--text-lighter);
+    background: var(--card-bg);
+    border: 1px dashed var(--empty-border);
     border-radius: 8px;
+    transition: background-color 0.2s, border-color 0.2s;
 }
 
 .empty-state p {

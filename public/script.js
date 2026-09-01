@@ -236,3 +236,25 @@ function escapeHtml(str) {
     div.textContent = str;
     return div.innerHTML;
 }
+
+// Dark mode
+function initTheme() {
+    const saved = localStorage.getItem('darkMode');
+    if (saved !== null) {
+        return saved === 'true';
+    }
+    return window.matchMedia('(prefers-color-scheme: dark)').matches;
+}
+
+function applyTheme(dark) {
+    document.body.classList.toggle('dark-mode', dark);
+    document.getElementById('themeToggle').innerHTML = dark ? '&#9788;' : '&#9789;';
+}
+
+function toggleDarkMode() {
+    const isDark = document.body.classList.toggle('dark-mode');
+    localStorage.setItem('darkMode', isDark);
+    document.getElementById('themeToggle').innerHTML = isDark ? '&#9788;' : '&#9789;';
+}
+
+applyTheme(initTheme());
