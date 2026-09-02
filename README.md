@@ -1,6 +1,6 @@
 # Student Task Manager
 
-A simple Node.js (Express) web app for students to manage homework assignments and deadlines.
+A simple Node.js (Express) web app for students to manage homework assignments and deadlines that has good UI.
 
 ## Features
 
