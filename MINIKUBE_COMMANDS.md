@@ -46,7 +46,7 @@ kubectl port-forward svc/student-task-manager-service 3000:80
 
 ## 7. Stop the Service
 ```bash
-kubectl delete service student-task-manager-service
+kubectl delete service student-task-`manager-service
 kubectl delete deployment student-task-manager
 kubectl get pods,svc
 ```
