@@ -19,13 +19,27 @@ npm start
 
 Open http://localhost:3000 in your browser.
 
-## Build (Jenkins)
+## Build (Jenkins Freestyle)
 
 The `build.sh` script installs dependencies, syntax-checks the server, starts the app in the background, and verifies the API is responding. In a Jenkins Freestyle job, add an Execute shell step:
 
 ```bash
 bash build.sh
 ```
+
+## Test
+
+`test.js` checks that `server.js`, `package.json`, and `public/index.html` exist. It exits 1 if any file is missing, so Jenkins marks the build as failed.
+
+```bash
+npm test
+```
+
+## Pipeline (Jenkins)
+
+The `Jenkinsfile` defines 4 stages: Checkout, Install Dependencies (`npm install`), Build (`npm run build`), Automated Testing (`npm test`).
+
+In Jenkins, create a New Item > Pipeline > Pipeline script from SCM > Git > paste repo URL > Script Path `Jenkinsfile` > Build Now.
 
 ## API
 
